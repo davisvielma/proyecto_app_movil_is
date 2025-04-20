@@ -2,7 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:sistema_peaje/services/auth_service.dart';
 
 class LoginPage extends StatefulWidget {
-  const LoginPage({super.key});
+  final AuthService auth;
+
+  const LoginPage({super.key, required this.auth});
 
   @override
   State<LoginPage> createState() => _LoginPageState();
@@ -13,7 +15,6 @@ class _LoginPageState extends State<LoginPage> {
   TextEditingController passwordController = TextEditingController();
   String email = '';
   String password = '';
-  AuthService auth = AuthService();
 
   @override
   Widget build(BuildContext context) {
@@ -34,11 +35,11 @@ class _LoginPageState extends State<LoginPage> {
       body: Stack(
         children: [
           // Imagen de fondo
-          // Positioned.fill(
-          //   child: Image.asset('assets/images/login_bg.jpg', fit: BoxFit.cover),
-          // ),
+          Positioned.fill(
+            child: Image.asset('assets/images/login.png', fit: BoxFit.cover),
+          ),
           // Capa semitransparente para mejorar legibilidad
-          Container(color: Colors.blue),
+          Container(color: Colors.transparent),
 
           // Contenido
           Padding(
@@ -60,11 +61,39 @@ class _LoginPageState extends State<LoginPage> {
                 ),
                 TextField(
                   controller: emailController,
+                  style: TextStyle(
+                    color: Colors.white,
+                  ), // Color del texto ingresado
                   decoration: InputDecoration(
                     labelText: 'Email',
+                    labelStyle: TextStyle(
+                      color: Colors.white,
+                      fontWeight: FontWeight.bold,
+                      fontSize: 18,
+                    ), // Color del label
+                    hintStyle: TextStyle(color: Colors.white), // Color del hint
                     filled: true,
-                    fillColor: Colors.white,
-                    prefixIcon: Icon((Icons.search)),
+                    fillColor: const Color.fromRGBO(108, 146, 134, 1),
+                    prefixIcon: Icon(Icons.email, color: Colors.white),
+                    border: OutlineInputBorder(
+                      // Borde normal
+                      borderRadius: BorderRadius.circular(60),
+                      borderSide: BorderSide.none, // Sin borde visible
+                    ),
+                    enabledBorder: OutlineInputBorder(
+                      // Borde cuando está habilitado
+                      borderRadius: BorderRadius.circular(60),
+                      borderSide: BorderSide.none,
+                    ),
+                    focusedBorder: OutlineInputBorder(
+                      // Borde cuando está enfocado
+                      borderRadius: BorderRadius.circular(60),
+                      borderSide: BorderSide.none,
+                    ),
+                    contentPadding: EdgeInsets.symmetric(
+                      vertical: 15.0,
+                      horizontal: 20.0,
+                    ),
                   ),
                   onChanged: (text) {
                     setState(() {
@@ -75,11 +104,39 @@ class _LoginPageState extends State<LoginPage> {
                 SizedBox(height: 20),
                 TextField(
                   controller: passwordController,
+                  style: TextStyle(
+                    color: Colors.white,
+                  ), // Color del texto ingresado
                   decoration: InputDecoration(
                     labelText: 'Password',
+                    labelStyle: TextStyle(
+                      color: Colors.white,
+                      fontWeight: FontWeight.bold,
+                      fontSize: 18,
+                    ), // Color del label
+                    hintStyle: TextStyle(color: Colors.white), // Color del hint
                     filled: true,
-                    fillColor: Colors.white,
-                    prefixIcon: Icon((Icons.key)),
+                    fillColor: const Color.fromRGBO(108, 146, 134, 1),
+                    prefixIcon: Icon(Icons.key, color: Colors.white),
+                    border: OutlineInputBorder(
+                      // Borde normal
+                      borderRadius: BorderRadius.circular(60),
+                      borderSide: BorderSide.none, // Sin borde visible
+                    ),
+                    enabledBorder: OutlineInputBorder(
+                      // Borde cuando está habilitado
+                      borderRadius: BorderRadius.circular(60),
+                      borderSide: BorderSide.none,
+                    ),
+                    focusedBorder: OutlineInputBorder(
+                      // Borde cuando está enfocado
+                      borderRadius: BorderRadius.circular(60),
+                      borderSide: BorderSide.none,
+                    ),
+                    contentPadding: EdgeInsets.symmetric(
+                      vertical: 15.0,
+                      horizontal: 20.0,
+                    ),
                   ),
                   obscureText: true,
                   onChanged: (text) {
@@ -103,7 +160,7 @@ class _LoginPageState extends State<LoginPage> {
                     ),
                     onPressed: () async {
                       if (email.isNotEmpty && password.isNotEmpty) {
-                        await auth.login(email, password);
+                        await widget.auth.login(email, password);
                       }
                     },
                   ),

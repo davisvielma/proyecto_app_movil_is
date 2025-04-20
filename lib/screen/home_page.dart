@@ -21,7 +21,7 @@ class HomePage extends StatelessWidget {
                 auth.logout();
                 Navigator.pushAndRemoveUntil(
                   context,
-                  MaterialPageRoute(builder: (context) => LoginPage()),
+                  MaterialPageRoute(builder: (context) => LoginPage(auth: auth)),
                   (Route<dynamic> route) => false,
                 );
               },

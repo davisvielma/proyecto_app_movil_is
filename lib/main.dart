@@ -21,7 +21,7 @@ class MainApp extends StatelessWidget {
         future: Future.delayed(Duration.zero, () => auth.isLoggedIn),
         builder: (context, snapshot) {
           if (snapshot.connectionState == ConnectionState.done) {
-            return snapshot.data == true ? HomePage(auth: auth) : LoginPage();
+            return snapshot.data == true ? HomePage(auth: auth) : LoginPage(auth: auth);
           }
           return CircularProgressIndicator();
         },
