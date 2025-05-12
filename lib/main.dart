@@ -17,13 +17,14 @@ class MainApp extends StatelessWidget {
     return MaterialApp(
       title: 'Login Demo',
       theme: ThemeData(primarySwatch: Colors.blue),
-      home: FutureBuilder(
-        future: Future.delayed(Duration.zero, () => auth.isLoggedIn),
+      home: StreamBuilder<bool>(
+        stream: auth.authStateChanges, // Escucha cambios en el estado
         builder: (context, snapshot) {
-          if (snapshot.connectionState == ConnectionState.done) {
-            return snapshot.data == true ? HomePage(auth: auth) : LoginPage(auth: auth);
+          if (snapshot.hasData && snapshot.data == true) {
+            return HomePage(auth: auth);
+          } else {
+            return LoginPage(auth: auth);
           }
-          return CircularProgressIndicator();
         },
       ),
     );
