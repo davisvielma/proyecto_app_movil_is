@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:sistema_peaje/services/auth_service.dart';
-import 'package:sistema_peaje/screen/login_page.dart';
 
 class HomePage extends StatelessWidget {
   final AuthService auth;
@@ -17,13 +16,8 @@ class HomePage extends StatelessWidget {
           actions: [
             IconButton(
               icon: Icon(Icons.logout),
-              onPressed: () {
-                auth.logout();
-                Navigator.pushAndRemoveUntil(
-                  context,
-                  MaterialPageRoute(builder: (context) => LoginPage(auth: auth)),
-                  (Route<dynamic> route) => false,
-                );
+              onPressed: () async  {
+                await auth.logout();
               },
             ),
           ],
