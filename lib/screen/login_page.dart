@@ -42,7 +42,7 @@ class _LoginPageState extends State<LoginPage> {
           Container(color: Colors.transparent),
 
           // Contenido
-          Padding(
+          SingleChildScrollView(
             padding: EdgeInsets.only(top: 48, bottom: 48, left: 32, right: 32),
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
