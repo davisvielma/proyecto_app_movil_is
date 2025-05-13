@@ -151,7 +151,7 @@ class _LoginPageState extends State<LoginPage> {
                   height: 55,
                   child: ElevatedButton(
                     child: Text(
-                      'Iniciar secion',
+                      'Iniciar sesión',
                       style: TextStyle(
                         color: Colors.blue,
                         fontSize: 28,
