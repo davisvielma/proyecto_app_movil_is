@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:sistema_peaje/services/auth_service.dart';
+import 'package:sistema_peaje/services/api_service.dart';
 
 class HomePage extends StatefulWidget {
   final AuthService auth;
-
   const HomePage({super.key, required this.auth});
 
   @override
@@ -11,42 +11,75 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomePage> {
+  final ApiService _apiService = ApiService();
   int _selectedView = 0; // 0: Total, 1: Tarjeta, 2: Efectivo
+  bool _isLoading = true;
+  String _errorMessage = '';
 
-  // Datos de ejemplo
-  final List<double> dailyTotal = [1200.0, 1500.0, 1800.0, 2100.0, 2400.0, 2700.0, 3000.0];
-  final List<double> dailyCard = [400.0, 500.0, 600.0, 700.0, 800.0, 900.0, 1000.0];
-  final List<double> dailyCash = [800.0, 1000.0, 1200.0, 1400.0, 1600.0, 1800.0, 2000.0];
+  List<dynamic> _dailyData = [];
+  List<dynamic> _weeklyData = [];
+  List<dynamic> _monthlyData = [];
 
-  final List<double> weeklyTotal = [15000.0, 18000.0, 21000.0, 24000.0];
-  final List<double> weeklyCard = [5000.0, 6000.0, 7000.0, 8000.0];
-  final List<double> weeklyCash = [10000.0, 12000.0, 14000.0, 16000.0];
+  @override
+  void initState() {
+    super.initState();
+    _fetchData();
+  }
 
-  final List<double> monthlyTotal = [80000.0, 85000.0, 90000.0, 95000.0, 100000.0];
-  final List<double> monthlyCard = [25000.0, 30000.0, 35000.0, 40000.0, 45000.0];
-  final List<double> monthlyCash = [55000.0, 55000.0, 55000.0, 55000.0, 55000.0];
+  Future<void> _fetchData() async {
+    setState(() {
+      _isLoading = true;
+      _errorMessage = '';
+    });
 
-  List<double> _getDailyData() {
-    switch (_selectedView) {
-      case 1: return dailyCard;
-      case 2: return dailyCash;
-      default: return dailyTotal;
+    try {
+      final results = await Future.wait([
+        _apiService.fetchDailyData(),
+        _apiService.fetchWeeklyData(),
+        _apiService.fetchMonthlyData(),
+      ]);
+
+      setState(() {
+        _dailyData = results[0];
+        _weeklyData = results[1];
+        _monthlyData = results[2];
+        _isLoading = false;
+      });
+    } catch (e) {
+      setState(() {
+        _isLoading = false;
+        _errorMessage = 'Error al cargar datos: $e';
+      });
     }
   }
 
-  List<double> _getWeeklyData() {
+  List<double> _getDailyValues() {
+    if (_dailyData.isEmpty) return [];
+
     switch (_selectedView) {
-      case 1: return weeklyCard;
-      case 2: return weeklyCash;
-      default: return weeklyTotal;
+      case 1: return _dailyData.map<double>((item) => item['card'].toDouble()).toList();
+      case 2: return _dailyData.map<double>((item) => item['cash'].toDouble()).toList();
+      default: return _dailyData.map<double>((item) => (item['card'] + item['cash']).toDouble()).toList();
     }
   }
 
-  List<double> _getMonthlyData() {
+  List<double> _getWeeklyValues() {
+    if (_weeklyData.isEmpty) return [];
+
     switch (_selectedView) {
-      case 1: return monthlyCard;
-      case 2: return monthlyCash;
-      default: return monthlyTotal;
+      case 1: return _weeklyData.map<double>((item) => item['card'].toDouble()).toList();
+      case 2: return _weeklyData.map<double>((item) => item['cash'].toDouble()).toList();
+      default: return _weeklyData.map<double>((item) => (item['card'] + item['cash']).toDouble()).toList();
+    }
+  }
+
+  List<double> _getMonthlyValues() {
+    if (_monthlyData.isEmpty) return [];
+
+    switch (_selectedView) {
+      case 1: return _monthlyData.map<double>((item) => item['card'].toDouble()).toList();
+      case 2: return _monthlyData.map<double>((item) => item['cash'].toDouble()).toList();
+      default: return _monthlyData.map<double>((item) => (item['card'] + item['cash']).toDouble()).toList();
     }
   }
 
@@ -60,74 +93,84 @@ class _HomePageState extends State<HomePage> {
 
   @override
   Widget build(BuildContext context) {
-    return PopScope(
-      canPop: false,
-      child: Scaffold(
-        appBar: AppBar(
-          title: Text(_getCurrentTitle()),
-          actions: [
-            IconButton(
-              icon: const Icon(Icons.logout),
-              onPressed: () async {
-                await widget.auth.logout();
-              },
+    return Scaffold(
+      appBar: AppBar(
+        title: Text(_getCurrentTitle()),
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.refresh),
+            onPressed: _fetchData,
+          ),
+          IconButton(
+            icon: const Icon(Icons.logout),
+            onPressed: () async {
+              await widget.auth.logout();
+            },
+          ),
+        ],
+      ),
+      body: _isLoading
+          ? const Center(child: CircularProgressIndicator())
+          : _errorMessage.isNotEmpty
+          ? Center(child: Text(_errorMessage))
+          : Column(
+        children: [
+          Padding(
+            padding: const EdgeInsets.all(8.0),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+              children: [
+                _buildToggleButton(0, 'Total'),
+                _buildToggleButton(1, 'Tarjeta'),
+                _buildToggleButton(2, 'Efectivo'),
+              ],
             ),
-          ],
-        ),
-        body: Column(
-          children: [
-            Padding(
-              padding: const EdgeInsets.all(8.0),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+          ),
+          Expanded(
+            child: SingleChildScrollView(
+              padding: const EdgeInsets.all(16.0),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: [
-                  _buildToggleButton(0, 'Total'),
-                  _buildToggleButton(1, 'Tarjeta'),
-                  _buildToggleButton(2, 'Efectivo'),
+                  _buildStatCard(
+                    title: 'Recaudación Diaria',
+                    data: _getDailyValues(),
+                    period: 'Últimos ${_dailyData.length} días',
+                    color: _selectedView == 0
+                        ? Colors.blue
+                        : _selectedView == 1
+                        ? Colors.green
+                        : Colors.orange,
+                  ),
+                  const SizedBox(height: 16),
+                  _buildStatCard(
+                    title: 'Recaudación Semanal',
+                    data: _getWeeklyValues(),
+                    period: 'Últimas ${_weeklyData.length} semanas',
+                    color: _selectedView == 0
+                        ? Colors.blue
+                        : _selectedView == 1
+                        ? Colors.green
+                        : Colors.orange,
+                  ),
+                  const SizedBox(height: 16),
+                  _buildStatCard(
+                    title: 'Recaudación Mensual',
+                    data: _getMonthlyValues(),
+                    period: 'Últimos ${_monthlyData.length} meses',
+                    color: _selectedView == 0
+                        ? Colors.blue
+                        : _selectedView == 1
+                        ? Colors.green
+                        : Colors.orange,
+                  ),
+                  const SizedBox(height: 24),
+                  _buildSummaryCard(),
                 ],
               ),
             ),
-            Expanded(
-              child: SingleChildScrollView(
-                padding: const EdgeInsets.all(16.0),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.stretch,
-                  children: [
-                    _buildStatCard(
-                      title: 'Recaudación Diaria',
-                      data: _getDailyData(),
-                      period: 'Últimos 7 días',
-                      color: _selectedView == 0 ? Colors.blue :
-                      _selectedView == 1 ? Colors.green : Colors.orange,
-                    ),
-                    const SizedBox(height: 16),
-                    _buildStatCard(
-                      title: 'Recaudación Semanal',
-                      data: _getWeeklyData(),
-                      period: 'Últimas 4 semanas',
-                      color: _selectedView == 0 ? Colors.blue :
-                      _selectedView == 1 ? Colors.green : Colors.orange,
-                    ),
-                    const SizedBox(height: 16),
-                    _buildStatCard(
-                      title: 'Recaudación Mensual',
-                      data: _getMonthlyData(),
-                      period: 'Últimos 5 meses',
-                      color: _selectedView == 0 ? Colors.blue :
-                      _selectedView == 1 ? Colors.green : Colors.orange,
-                    ),
-                    const SizedBox(height: 24),
-                    _buildSummaryCard(
-                      daily: _getDailyData().last,
-                      weekly: _getWeeklyData().last,
-                      monthly: _getMonthlyData().last,
-                    ),
-                  ],
-                ),
-              ),
-            ),
-          ],
-        ),
+          ),
+        ],
       ),
     );
   }
@@ -152,6 +195,15 @@ class _HomePageState extends State<HomePage> {
     required String period,
     required Color color,
   }) {
+    if (data.isEmpty) {
+      return Card(
+        child: Padding(
+          padding: const EdgeInsets.all(16.0),
+          child: Text('No hay datos disponibles para $title'),
+        ),
+      );
+    }
+
     return Card(
       elevation: 3,
       child: Padding(
@@ -209,11 +261,15 @@ class _HomePageState extends State<HomePage> {
     );
   }
 
-  Widget _buildSummaryCard({
-    required double daily,
-    required double weekly,
-    required double monthly,
-  }) {
+  Widget _buildSummaryCard() {
+    final dailyValues = _getDailyValues();
+    final weeklyValues = _getWeeklyValues();
+    final monthlyValues = _getMonthlyValues();
+
+    final dailyTotal = dailyValues.isNotEmpty ? dailyValues.last : 0;
+    final weeklyTotal = weeklyValues.isNotEmpty ? weeklyValues.last : 0;
+    final monthlyTotal = monthlyValues.isNotEmpty ? monthlyValues.last : 0;
+
     return Card(
       elevation: 3,
       child: Padding(
@@ -229,9 +285,9 @@ class _HomePageState extends State<HomePage> {
               ),
             ),
             const SizedBox(height: 12),
-            _buildSummaryRow('Hoy:', '${daily.toInt()} Bs'),
-            _buildSummaryRow('Esta semana:', '${weekly.toInt()} Bs'),
-            _buildSummaryRow('Este mes:', '${monthly.toInt()} Bs'),
+            _buildSummaryRow('Hoy:', '${dailyTotal.toInt()} Bs'),
+            _buildSummaryRow('Esta semana:', '${weeklyTotal.toInt()} Bs'),
+            _buildSummaryRow('Este mes:', '${monthlyTotal.toInt()} Bs'),
           ],
         ),
       ),

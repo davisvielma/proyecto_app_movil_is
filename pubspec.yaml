@@ -9,7 +9,7 @@ environment:
 dependencies:
   flutter:
     sdk: flutter
-
+  http: ^0.13.5       # Añadido para conexión API
   fl_chart: ^0.61.0
 
 dev_dependencies:
