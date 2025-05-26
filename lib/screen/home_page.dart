@@ -58,9 +58,18 @@ class _HomePageState extends State<HomePage> {
     if (_dailyData.isEmpty) return [];
 
     switch (_selectedView) {
-      case 1: return _dailyData.map<double>((item) => item['card'].toDouble()).toList();
-      case 2: return _dailyData.map<double>((item) => item['cash'].toDouble()).toList();
-      default: return _dailyData.map<double>((item) => (item['card'] + item['cash']).toDouble()).toList();
+      case 1:
+        return _dailyData
+            .map<double>((item) => item['card'].toDouble())
+            .toList();
+      case 2:
+        return _dailyData
+            .map<double>((item) => item['cash'].toDouble())
+            .toList();
+      default:
+        return _dailyData
+            .map<double>((item) => (item['card'] + item['cash']).toDouble())
+            .toList();
     }
   }
 
@@ -68,9 +77,18 @@ class _HomePageState extends State<HomePage> {
     if (_weeklyData.isEmpty) return [];
 
     switch (_selectedView) {
-      case 1: return _weeklyData.map<double>((item) => item['card'].toDouble()).toList();
-      case 2: return _weeklyData.map<double>((item) => item['cash'].toDouble()).toList();
-      default: return _weeklyData.map<double>((item) => (item['card'] + item['cash']).toDouble()).toList();
+      case 1:
+        return _weeklyData
+            .map<double>((item) => item['card'].toDouble())
+            .toList();
+      case 2:
+        return _weeklyData
+            .map<double>((item) => item['cash'].toDouble())
+            .toList();
+      default:
+        return _weeklyData
+            .map<double>((item) => (item['card'] + item['cash']).toDouble())
+            .toList();
     }
   }
 
@@ -78,17 +96,29 @@ class _HomePageState extends State<HomePage> {
     if (_monthlyData.isEmpty) return [];
 
     switch (_selectedView) {
-      case 1: return _monthlyData.map<double>((item) => item['card'].toDouble()).toList();
-      case 2: return _monthlyData.map<double>((item) => item['cash'].toDouble()).toList();
-      default: return _monthlyData.map<double>((item) => (item['card'] + item['cash']).toDouble()).toList();
+      case 1:
+        return _monthlyData
+            .map<double>((item) => item['card'].toDouble())
+            .toList();
+      case 2:
+        return _monthlyData
+            .map<double>((item) => item['cash'].toDouble())
+            .toList();
+      default:
+        return _monthlyData
+            .map<double>((item) => (item['card'] + item['cash']).toDouble())
+            .toList();
     }
   }
 
   String _getCurrentTitle() {
     switch (_selectedView) {
-      case 1: return 'Recaudación por Tarjeta';
-      case 2: return 'Recaudación en Efectivo';
-      default: return 'Recaudación Total';
+      case 1:
+        return 'Recaudación por Tarjeta';
+      case 2:
+        return 'Recaudación en Efectivo';
+      default:
+        return 'Recaudación Total';
     }
   }
 
@@ -98,10 +128,7 @@ class _HomePageState extends State<HomePage> {
       appBar: AppBar(
         title: Text(_getCurrentTitle()),
         actions: [
-          IconButton(
-            icon: const Icon(Icons.refresh),
-            onPressed: _fetchData,
-          ),
+          IconButton(icon: const Icon(Icons.refresh), onPressed: _fetchData),
           IconButton(
             icon: const Icon(Icons.logout),
             onPressed: () async {
@@ -110,69 +137,86 @@ class _HomePageState extends State<HomePage> {
           ),
         ],
       ),
-      body: _isLoading
-          ? const Center(child: CircularProgressIndicator())
-          : _errorMessage.isNotEmpty
-          ? Center(child: Text(_errorMessage))
-          : Column(
-        children: [
-          Padding(
-            padding: const EdgeInsets.all(8.0),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-              children: [
-                _buildToggleButton(0, 'Total'),
-                _buildToggleButton(1, 'Tarjeta'),
-                _buildToggleButton(2, 'Efectivo'),
-              ],
-            ),
-          ),
-          Expanded(
-            child: SingleChildScrollView(
-              padding: const EdgeInsets.all(16.0),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.stretch,
+      body:
+          _isLoading
+              ? const Center(child: CircularProgressIndicator())
+              : _errorMessage.isNotEmpty
+              ? Center(child: Text(_errorMessage))
+              : Column(
                 children: [
-                  _buildStatCard(
-                    title: 'Recaudación Diaria',
-                    data: _getDailyValues(),
-                    period: 'Últimos ${_dailyData.length} días',
-                    color: _selectedView == 0
-                        ? Colors.blue
-                        : _selectedView == 1
-                        ? Colors.green
-                        : Colors.orange,
+                  Padding(
+                    padding: const EdgeInsets.all(8.0),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                      children: [
+                        _buildToggleButton(0, 'Total'),
+                        _buildToggleButton(1, 'Tarjeta'),
+                        _buildToggleButton(2, 'Efectivo'),
+                      ],
+                    ),
                   ),
-                  const SizedBox(height: 16),
-                  _buildStatCard(
-                    title: 'Recaudación Semanal',
-                    data: _getWeeklyValues(),
-                    period: 'Últimas ${_weeklyData.length} semanas',
-                    color: _selectedView == 0
-                        ? Colors.blue
-                        : _selectedView == 1
-                        ? Colors.green
-                        : Colors.orange,
+                  Expanded(
+                    child: SingleChildScrollView(
+                      padding: const EdgeInsets.all(16.0),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.stretch,
+                        children: [
+                          _buildStatCard(
+                            title: 'Recaudación Diaria',
+                            data: _getDailyValues(),
+                            period: 'Últimos ${_dailyData.length} días',
+                            color:
+                                _selectedView == 0
+                                    ? Colors.blue
+                                    : _selectedView == 1
+                                    ? Colors.green
+                                    : Colors.orange,
+                          ),
+                          const SizedBox(height: 16),
+                          _buildStatCard(
+                            title: 'Recaudación Semanal',
+                            data: _getWeeklyValues(),
+                            period: 'Últimas ${_weeklyData.length} semanas',
+                            color:
+                                _selectedView == 0
+                                    ? Colors.blue
+                                    : _selectedView == 1
+                                    ? Colors.green
+                                    : Colors.orange,
+                          ),
+                          const SizedBox(height: 16),
+                          _buildStatCard(
+                            title: 'Recaudación Mensual',
+                            data: _getMonthlyValues(),
+                            period: 'Últimos ${_monthlyData.length} meses',
+                            color:
+                                _selectedView == 0
+                                    ? Colors.blue
+                                    : _selectedView == 1
+                                    ? Colors.green
+                                    : Colors.orange,
+                          ),
+                          const SizedBox(height: 24),
+                          _buildSummaryCard(),
+                          ElevatedButton(
+                            onPressed: () {
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                  builder:
+                                      (context) =>
+                                          StreamVehicular(auth: widget.auth),
+                                ),
+                              );
+                            },
+                            child: Text('Flujo Vehicular'),
+                          ),
+                        ],
+                      ),
+                    ),
                   ),
-                  const SizedBox(height: 16),
-                  _buildStatCard(
-                    title: 'Recaudación Mensual',
-                    data: _getMonthlyValues(),
-                    period: 'Últimos ${_monthlyData.length} meses',
-                    color: _selectedView == 0
-                        ? Colors.blue
-                        : _selectedView == 1
-                        ? Colors.green
-                        : Colors.orange,
-                  ),
-                  const SizedBox(height: 24),
-                  _buildSummaryCard(),
                 ],
               ),
-            ),
-          ),
-        ],
-      ),
     );
   }
 
@@ -243,7 +287,10 @@ class _HomePageState extends State<HomePage> {
                         ),
                         const SizedBox(height: 4),
                         Container(
-                          height: data[index] / data.reduce((a, b) => a > b ? a : b) * 60,
+                          height:
+                              data[index] /
+                              data.reduce((a, b) => a > b ? a : b) *
+                              60,
                           color: color,
                         ),
                         Text(
@@ -280,10 +327,7 @@ class _HomePageState extends State<HomePage> {
           children: [
             const Text(
               'Resumen',
-              style: TextStyle(
-                fontSize: 18,
-                fontWeight: FontWeight.bold,
-              ),
+              style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
             ),
             const SizedBox(height: 12),
             _buildSummaryRow('Hoy:', '${dailyTotal.toInt()} Bs'),
@@ -302,7 +346,10 @@ class _HomePageState extends State<HomePage> {
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
           Text(label, style: const TextStyle(fontSize: 16)),
-          Text(value, style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
+          Text(
+            value,
+            style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+          ),
         ],
       ),
     );

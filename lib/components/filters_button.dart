@@ -16,6 +16,7 @@ class _FiltersButtonState extends State<FiltersButton> {
   @override
   Widget build(BuildContext context) {
     return Row(
+      mainAxisAlignment: MainAxisAlignment.center,
       children: List.generate(3, (index) {
         return Padding(
           padding: const EdgeInsets.all(8.0),

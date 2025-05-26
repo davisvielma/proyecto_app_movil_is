@@ -1,7 +1,10 @@
+// ignore_for_file: deprecated_member_use, use_build_context_synchronously
+
 import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
 import 'package:sistema_peaje/components/filters_button.dart';
 import 'package:sistema_peaje/services/auth_service.dart';
+import 'package:sistema_peaje/services/api_service.dart';
 
 class StreamVehicular extends StatefulWidget {
   final AuthService auth;
@@ -13,6 +16,7 @@ class StreamVehicular extends StatefulWidget {
 }
 
 class _StreamVehicularState extends State<StreamVehicular> {
+  final ApiService _apiService = ApiService();
   List<BarChartGroupData> barData = []; // Datos para el gráfico de barras
   bool isLoading = true;
   String currentFilter = "days";
@@ -29,40 +33,28 @@ class _StreamVehicularState extends State<StreamVehicular> {
     });
 
     try {
-      // Datos de prueba
-      final List<Map<String, double>> mockData =
-          currentFilter == "days"
-              ? [
-                {"time": 1, "count": 10},
-                {"time": 2, "count": 15},
-                {"time": 3, "count": 20},
-                {"time": 4, "count": 8},
-                {"time": 5, "count": 11},
-                {"time": 6, "count": 12},
-                {"time": 7, "count": 25},
-              ]
-              : currentFilter == "weeks"
-              ? [
-                {"time": 1, "count": 50},
-                {"time": 2, "count": 60},
-                {"time": 3, "count": 70},
-                {"time": 4, "count": 70},
-              ]
-              : [
-                {"time": 1, "count": 200},
-                {"time": 2, "count": 250},
-                {"time": 3, "count": 300},
-              ];
+      List<dynamic> apiData;
+      if (currentFilter == "days") {
+        apiData = await _apiService.fetchStreamVehicularDayData();
+      } else if (currentFilter == "weeks") {
+        apiData = await _apiService.fetchStreamVehicularweekData();
+      } else {
+        apiData = await _apiService.fetchStreamVehicularMonthData();
+      }
 
-      // Convertir los datos de prueba a BarChartGroupData
+      // Suponiendo que cada item tiene 'id' y 'count'
       final data =
-          mockData
+          apiData
+              .asMap()
+              .entries
               .map(
-                (point) => BarChartGroupData(
-                  x: point['time']!.toInt(),
+                (entry) => BarChartGroupData(
+                  x:
+                      entry.key +
+                      1, // O usa entry.value['id'] si viene del backend
                   barRods: [
                     BarChartRodData(
-                      toY: point['count']!,
+                      toY: (entry.value['count'] ?? 0).toDouble(),
                       color: Colors.blue,
                       width: 36,
                       borderRadius: BorderRadius.zero,
@@ -101,7 +93,7 @@ class _StreamVehicularState extends State<StreamVehicular> {
   @override
   Widget build(BuildContext context) {
     return PopScope(
-      canPop: false,
+      canPop: true,
       child: Scaffold(
         appBar: AppBar(
           title: Text('Flujo vehicular'),
@@ -116,29 +108,31 @@ class _StreamVehicularState extends State<StreamVehicular> {
         ),
         body: Column(
           children: [
-            Container(
+            SizedBox(
               width: double.infinity,
               height: 50,
-              color: Colors.amber,
               child: FiltersButton(onFilterSelected: onFilterSelected),
             ),
             Expanded(
               child: Padding(
-                padding: const EdgeInsets.only(
-                  top: 25,
-                  bottom: 40,
-                  left: 40,
-                  right: 40,
-                ),
+                padding: const EdgeInsets.all(25.0),
                 child: Stack(
                   children: [
                     Container(
-                      color: Colors.cyanAccent,
+                      decoration: BoxDecoration(
+                        color: Colors.white, // Fondo blanco
+                        borderRadius: BorderRadius.circular(8),
+                        border: Border.all(
+                          color: Colors.grey.withOpacity(0.5),
+                          width: 1,
+                        ),
+                      ),
                       child: Padding(
                         padding: const EdgeInsets.all(20.0),
                         child: BarChart(
                           BarChartData(
                             barGroups: barData,
+                            groupsSpace: 8,
                             maxY:
                                 barData.isNotEmpty
                                     ? barData
@@ -148,7 +142,7 @@ class _StreamVehicularState extends State<StreamVehicular> {
                                             )
                                             .reduce((a, b) => a > b ? a : b) *
                                         1.2
-                                    : 0, // Ajusta el valor máximo del eje Y para dejar espacio
+                                    : 0,
                             titlesData: FlTitlesData(
                               topTitles: AxisTitles(
                                 sideTitles: SideTitles(showTitles: false),
@@ -177,18 +171,13 @@ class _StreamVehicularState extends State<StreamVehicular> {
                                 ),
                               ),
                             ),
-                            gridData: FlGridData(
-                              show: false,
-                              drawHorizontalLine: true,
-                              horizontalInterval:
-                                  5, // Intervalo entre líneas horizontales
-                              getDrawingHorizontalLine: (value) {
-                                return FlLine(strokeWidth: 1);
-                              },
-                            ),
+                            gridData: FlGridData(show: false),
                             borderData: FlBorderData(
-                              show: false,
-                              border: Border.all(color: Colors.grey, width: 1),
+                              show: true,
+                              border: Border.all(
+                                color: Colors.grey.withOpacity(0.5),
+                                width: 1,
+                              ),
                             ),
                             barTouchData: BarTouchData(
                               touchTooltipData: BarTouchTooltipData(
