@@ -106,121 +106,140 @@ class _StreamVehicularState extends State<StreamVehicular> {
             ),
           ],
         ),
-        body: Column(
-          children: [
-            SizedBox(
-              width: double.infinity,
-              height: 50,
-              child: FiltersButton(onFilterSelected: onFilterSelected),
+        body: Container(
+          decoration: BoxDecoration(
+            gradient: LinearGradient(
+              colors: [
+                Colors.blue.shade200,
+                const Color.fromARGB(255, 211, 239, 252),
+              ],
+              begin: Alignment.topCenter,
+              end: Alignment.bottomCenter,
             ),
-            Expanded(
-              child: Padding(
-                padding: const EdgeInsets.all(25.0),
-                child: Stack(
-                  children: [
-                    Container(
-                      decoration: BoxDecoration(
-                        color: Colors.white, // Fondo blanco
-                        borderRadius: BorderRadius.circular(8),
-                        border: Border.all(
-                          color: Colors.grey.withOpacity(0.5),
-                          width: 1,
+          ),
+          child: Column(
+            children: [
+              SizedBox(
+                width: double.infinity,
+                height: 50,
+                child: FiltersButton(onFilterSelected: onFilterSelected),
+              ),
+              Expanded(
+                child: Padding(
+                  padding: const EdgeInsets.all(25.0),
+                  child: Stack(
+                    children: [
+                      Container(
+                        decoration: BoxDecoration(
+                          color: Colors.white,
+                          borderRadius: BorderRadius.circular(8),
+                          border: Border.all(
+                            color: const Color.fromARGB(
+                              255,
+                              255,
+                              253,
+                              253,
+                            ).withOpacity(0.5),
+                            width: 1,
+                          ),
                         ),
-                      ),
-                      child: Padding(
-                        padding: const EdgeInsets.all(20.0),
-                        child: BarChart(
-                          BarChartData(
-                            barGroups: barData,
-                            groupsSpace: 8,
-                            maxY:
-                                barData.isNotEmpty
-                                    ? barData
-                                            .map(
-                                              (group) =>
-                                                  group.barRods.first.toY,
-                                            )
-                                            .reduce((a, b) => a > b ? a : b) *
-                                        1.2
-                                    : 0,
-                            titlesData: FlTitlesData(
-                              topTitles: AxisTitles(
-                                sideTitles: SideTitles(showTitles: false),
-                              ),
-                              rightTitles: AxisTitles(
-                                sideTitles: SideTitles(showTitles: false),
-                              ),
-                              leftTitles: AxisTitles(
-                                sideTitles: SideTitles(showTitles: false),
-                              ),
-                              bottomTitles: AxisTitles(
-                                sideTitles: SideTitles(
-                                  showTitles: true,
-                                  getTitlesWidget: (value, meta) {
-                                    return Padding(
-                                      padding: const EdgeInsets.only(top: 8.0),
-                                      child: Text(
-                                        value.toInt().toString(),
-                                        style: TextStyle(
-                                          fontSize: 12,
-                                          fontWeight: FontWeight.bold,
+                        child: Padding(
+                          padding: const EdgeInsets.all(20.0),
+                          child: BarChart(
+                            BarChartData(
+                              barGroups: barData,
+                              groupsSpace: 8,
+                              maxY:
+                                  barData.isNotEmpty
+                                      ? barData
+                                              .map(
+                                                (group) =>
+                                                    group.barRods.first.toY,
+                                              )
+                                              .reduce((a, b) => a > b ? a : b) *
+                                          1.2
+                                      : 0,
+                              titlesData: FlTitlesData(
+                                topTitles: AxisTitles(
+                                  sideTitles: SideTitles(showTitles: false),
+                                ),
+                                rightTitles: AxisTitles(
+                                  sideTitles: SideTitles(showTitles: false),
+                                ),
+                                leftTitles: AxisTitles(
+                                  sideTitles: SideTitles(showTitles: false),
+                                ),
+                                bottomTitles: AxisTitles(
+                                  sideTitles: SideTitles(
+                                    showTitles: true,
+                                    getTitlesWidget: (value, meta) {
+                                      return Padding(
+                                        padding: const EdgeInsets.only(
+                                          top: 8.0,
                                         ),
+                                        child: Text(
+                                          value.toInt().toString(),
+                                          style: TextStyle(
+                                            fontSize: 12,
+                                            fontWeight: FontWeight.bold,
+                                          ),
+                                        ),
+                                      );
+                                    },
+                                  ),
+                                ),
+                              ),
+                              gridData: FlGridData(show: false),
+                              borderData: FlBorderData(
+                                show: true,
+                                border: Border.all(
+                                  color: const Color.fromARGB(255, 196, 194, 194).withOpacity(0.5),
+                                  width: 1,
+                                ),
+                              ),
+                              barTouchData: BarTouchData(
+                                touchTooltipData: BarTouchTooltipData(
+                                  tooltipPadding: const EdgeInsets.all(8.0),
+                                  tooltipMargin: 8,
+                                  getTooltipItem: (
+                                    group,
+                                    groupIndex,
+                                    rod,
+                                    rodIndex,
+                                  ) {
+                                    return BarTooltipItem(
+                                      '${rod.toY.toStringAsFixed(1)} vehículos',
+                                      TextStyle(
+                                        color: const Color.fromARGB(255, 170, 58, 58),
+                                        fontWeight: FontWeight.bold,
+                                        fontSize: 12,
                                       ),
                                     );
                                   },
                                 ),
                               ),
                             ),
-                            gridData: FlGridData(show: false),
-                            borderData: FlBorderData(
-                              show: true,
-                              border: Border.all(
-                                color: Colors.grey.withOpacity(0.5),
-                                width: 1,
-                              ),
-                            ),
-                            barTouchData: BarTouchData(
-                              touchTooltipData: BarTouchTooltipData(
-                                tooltipPadding: const EdgeInsets.all(8.0),
-                                tooltipMargin: 8,
-                                getTooltipItem: (
-                                  group,
-                                  groupIndex,
-                                  rod,
-                                  rodIndex,
-                                ) {
-                                  return BarTooltipItem(
-                                    '${rod.toY.toStringAsFixed(1)} vehículos',
-                                    TextStyle(
-                                      color: Colors.white,
-                                      fontWeight: FontWeight.bold,
-                                      fontSize: 12,
-                                    ),
-                                  );
-                                },
-                              ),
-                            ),
                           ),
                         ),
                       ),
-                    ),
-                    Positioned(
-                      top: 20,
-                      left: 20,
-                      child: Text(
-                        'Flujo Vehicular',
-                        style: TextStyle(
-                          fontSize: 18,
-                          fontWeight: FontWeight.bold,
-                          color: Colors.black,
+                      Positioned(
+                        top: 20,
+                        left: 20,
+                        child: Text(
+                          'Flujo Vehicular',
+                          style: TextStyle(
+                            fontSize: 18,
+                            fontWeight: FontWeight.bold,
+                            color: Colors.black,
+                          ),
                         ),
                       ),
-                    ),
-                  ],
+                    ],
+                  ),
                 ),
               ),
-            ),
-          ],
+            ],
+          ),
         ),
       ),
     );

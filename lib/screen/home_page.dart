@@ -124,8 +124,18 @@ class _HomePageState extends State<HomePage> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
+    return Container(
+      decoration: BoxDecoration(
+        gradient: LinearGradient(
+          colors: [Colors.blue.shade200, const Color.fromARGB(255, 221, 242, 255)],
+          begin: Alignment.topCenter,
+          end: Alignment.bottomCenter,
+        ),
+      ),
+      child: Scaffold(
+        backgroundColor: Colors.transparent,
+        appBar: AppBar(
+
         title: Text(_getCurrentTitle()),
         actions: [
           IconButton(icon: const Icon(Icons.refresh), onPressed: _fetchData),
@@ -144,6 +154,32 @@ class _HomePageState extends State<HomePage> {
               ? Center(child: Text(_errorMessage))
               : Column(
                 children: [
+                  const SizedBox(height: 16),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      ElevatedButton(
+                        onPressed: () {
+                          setState(() {
+                            _selectedView = 0; // Recaudación
+                          });
+                        },
+                        child: const Text('Recaudación'),
+                      ),
+                      const SizedBox(width: 16),
+                      ElevatedButton(
+                        onPressed: () {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) => StreamVehicular(auth: widget.auth),
+                            ),
+                          );
+                        },
+                        child: const Text('Flujo Vehicular'),
+                      ),
+                    ],
+                  ),
                   Padding(
                     padding: const EdgeInsets.all(8.0),
                     child: Row(
@@ -198,32 +234,20 @@ class _HomePageState extends State<HomePage> {
                           ),
                           const SizedBox(height: 24),
                           _buildSummaryCard(),
-                          ElevatedButton(
-                            onPressed: () {
-                              Navigator.push(
-                                context,
-                                MaterialPageRoute(
-                                  builder:
-                                      (context) =>
-                                          StreamVehicular(auth: widget.auth),
-                                ),
-                              );
-                            },
-                            child: Text('Flujo Vehicular'),
-                          ),
                         ],
                       ),
                     ),
                   ),
                 ],
               ),
+      ),      
     );
   }
 
   Widget _buildToggleButton(int index, String text) {
     return ElevatedButton(
       style: ElevatedButton.styleFrom(
-        backgroundColor: _selectedView == index ? Colors.blue : Colors.grey,
+        backgroundColor: _selectedView == index ? Colors.blue : const Color.fromARGB(255, 255, 255, 255),
       ),
       onPressed: () {
         setState(() {
@@ -266,7 +290,7 @@ class _HomePageState extends State<HomePage> {
             ),
             Text(
               period,
-              style: const TextStyle(fontSize: 14, color: Colors.grey),
+              style: const TextStyle(fontSize: 14, color: Color.fromARGB(255, 255, 252, 252)),
             ),
             const SizedBox(height: 8),
             SizedBox(
