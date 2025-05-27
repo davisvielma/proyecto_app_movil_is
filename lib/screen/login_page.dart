@@ -15,6 +15,19 @@ class _LoginPageState extends State<LoginPage> {
   TextEditingController passwordController = TextEditingController();
   String email = '';
   String password = '';
+  bool _isEmailValid = false;
+  bool _isPasswordValid = false;
+
+  // Email validation function
+  bool _validateEmail(String email) {
+    return RegExp(r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$').hasMatch(email);
+  }
+
+  // Password validation function (exactly 8 digits)
+  bool _validatePassword(String password) {
+    return password.length == 8 &&
+        RegExp(r'^[a-zA-Z0-9]{8}$').hasMatch(password);
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -90,14 +103,21 @@ class _LoginPageState extends State<LoginPage> {
                       borderRadius: BorderRadius.circular(60),
                       borderSide: BorderSide.none,
                     ),
+                    errorText:
+                        email.isNotEmpty && !_isEmailValid
+                            ? 'Ingrese un email válido'
+                            : null,
+                    errorStyle: TextStyle(color: Colors.amber),
                     contentPadding: EdgeInsets.symmetric(
                       vertical: 15.0,
                       horizontal: 20.0,
                     ),
                   ),
+                  keyboardType: TextInputType.emailAddress,
                   onChanged: (text) {
                     setState(() {
                       email = text;
+                      _isEmailValid = _validateEmail(email);
                     });
                   },
                 ),
@@ -133,6 +153,11 @@ class _LoginPageState extends State<LoginPage> {
                       borderRadius: BorderRadius.circular(60),
                       borderSide: BorderSide.none,
                     ),
+                    errorText:
+                        password.isNotEmpty && !_isPasswordValid
+                            ? 'La clave debe tener exactamente 8 caracteres'
+                            : null,
+                    errorStyle: TextStyle(color: Colors.amber),
                     contentPadding: EdgeInsets.symmetric(
                       vertical: 15.0,
                       horizontal: 20.0,
@@ -142,6 +167,7 @@ class _LoginPageState extends State<LoginPage> {
                   onChanged: (text) {
                     setState(() {
                       password = text;
+                      _isPasswordValid = _validatePassword(password);
                     });
                   },
                 ),
@@ -150,6 +176,20 @@ class _LoginPageState extends State<LoginPage> {
                   width: double.infinity,
                   height: 55,
                   child: ElevatedButton(
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor:
+                          _isEmailValid && _isPasswordValid
+                              ? Colors.white
+                              : Colors.grey, // Disabled color
+                    ),
+                    onPressed:
+                        (_isEmailValid && _isPasswordValid)
+                            ? () async {
+                              if (email.isNotEmpty && password.isNotEmpty) {
+                                await widget.auth.login(email, password);
+                              }
+                            }
+                            : null,
                     child: Text(
                       'Iniciar sesión',
                       style: TextStyle(
@@ -158,11 +198,6 @@ class _LoginPageState extends State<LoginPage> {
                         fontWeight: FontWeight.w500,
                       ),
                     ),
-                    onPressed: () async {
-                      if (email.isNotEmpty && password.isNotEmpty) {
-                        await widget.auth.login(email, password);
-                      }
-                    },
                   ),
                 ),
               ],
